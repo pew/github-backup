@@ -49,4 +49,4 @@ else:
             o.pull()
         else:
             print('backing up: %s' % (r['name']))
-            Repo.clone_from(r['clone_url'], destDir+r['name'])
+            Repo.clone_from(r['clone_url'], os.path.normpath(destDir+os.sep+r['name']))
