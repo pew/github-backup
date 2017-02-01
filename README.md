@@ -9,5 +9,5 @@ pip install -r requirements.txt
 ```
 
 ```
-python application.py <username> <destDir>
+python application.py -u <username> -d <destDir> [-f]
 ```

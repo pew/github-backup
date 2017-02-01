@@ -1,25 +1,35 @@
+import argparse
 import requests
 import json
 import sys
+import shutil
 from git import Repo
 import os
 
+parser = argparse.ArgumentParser(description='Backup GitHub repos.')
+parser.add_argument('-u','--user', help='GitHub username.', required=True)
+parser.add_argument('-d','--dest', help='Where to store the data.', required=True)
+parser.add_argument('-f','--force', help='Force backup to destination folder.', required=False, action='store_true')
+args = parser.parse_args()
 
-if len(sys.argv) < 3:
-    sys.exit('Usage: %s username dest-path' % sys.argv[0])
-
-username = sys.argv[1]
-destDir = sys.argv[2]
-
-if destDir.endswith("/"):
-    destDir = sys.argv[2]
-else:
-    destDir = sys.argv[2]+"/"
+username = args.user
+destDir = args.dest
 
 if not os.path.exists(destDir):
-    os.makedirs(destDir)
+    try:
+        os.makedirs(destDir)
+        print('Created folder %s' % (destDir))
+    except:
+        sys.exit('Could not create folder %s' % (destDir))
 else:
-    pass
+    if args.force is True:
+        pass
+    else:
+        q = input('Folder %s already exist, use this one (y/n)?' % (destDir))
+        if not q == 'y':
+            sys.exit('Exiting.')
+        else:
+            pass
 
 req = requests.get("https://api.github.com/users/"+username+"/repos")
 if req.status_code != 200:
@@ -32,7 +42,7 @@ else:
         repositories.append({'name': r['name'], 'clone_url': r['clone_url']})
 
     for r in repositories:
-        if os.path.exists(destDir+r['name']+"/.git"):
+        if os.path.exists(destDir+r['name']+os.sep+".git"):
             print('%s already cloned, will pull changes.' % (r['name']))
             repo = Repo(destDir+r['name'])
             o = repo.remotes.origin
