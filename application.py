@@ -31,22 +31,26 @@ else:
         else:
             pass
 
-req = requests.get("https://api.github.com/users/"+username+"/repos")
-if req.status_code != 200:
-    sys.exit('Could not reach GitHub.')
-else:
-    print('backing up to: %s' % (destDir))
-    repositories = []
-    repos = json.loads(req.text)
-    for r in repos:
-        repositories.append({'name': r['name'], 'clone_url': r['clone_url']})
+def main():
+    req = requests.get("https://api.github.com/users/"+username+"/repos")
+    if req.status_code != 200:
+        sys.exit('Could not reach GitHub.')
+    else:
+        print('backing up to: %s' % (destDir))
+        repositories = []
+        repos = json.loads(req.text)
+        for r in repos:
+            repositories.append({'name': r['name'], 'clone_url': r['clone_url']})
 
-    for r in repositories:
-        if os.path.exists(destDir+r['name']+os.sep+".git"):
-            print('%s already cloned, will pull changes.' % (r['name']))
-            repo = Repo(destDir+r['name'])
-            o = repo.remotes.origin
-            o.pull()
-        else:
-            print('backing up: %s' % (r['name']))
-            Repo.clone_from(r['clone_url'], os.path.normpath(destDir+os.sep+r['name']))
+        for r in repositories:
+            if os.path.exists(destDir+r['name']+os.sep+".git"):
+                print('%s already cloned, will pull changes.' % (r['name']))
+                repo = Repo(destDir+r['name'])
+                o = repo.remotes.origin
+                o.pull()
+            else:
+                print('backing up: %s' % (r['name']))
+                Repo.clone_from(r['clone_url'], os.path.normpath(destDir+os.sep+r['name']))
+
+if __name__ == '__main__':
+    main()
