@@ -43,9 +43,9 @@ def main():
             repositories.append({'name': r['name'], 'clone_url': r['clone_url']})
 
         for r in repositories:
-            if os.path.exists(destDir+r['name']+os.sep+".git"):
+            if os.path.exists(os.path.normpath(destDir+os.sep+r['name']+os.sep+".git")):
                 print('%s already cloned, will pull changes.' % (r['name']))
-                repo = Repo(destDir+r['name'])
+                repo = Repo(os.path.normpath(destDir+os.sep+r['name']))
                 o = repo.remotes.origin
                 o.pull()
             else:
